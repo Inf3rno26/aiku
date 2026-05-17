@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aiku Finance Dashboard v3</title>
+  <style>
+    :root{
+      --bg:#07111f;--panel:#0f172a;--panel2:#0b1425;--line:#23344d;--text:#e5eefc;--muted:#93a7c6;
+      --pri:#3b82f6;--pri2:#2563eb;--green:#22c55e;--blue:#38bdf8;--gold:#f59e0b;--red:#ef4444;
+      --shadow:0 18px 40px rgba(0,0,0,.32);--radius:18px
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#060b14 0%,#09111f 100%);color:var(--text)}
+    body{overflow-x:hidden}
+    button,input,select,textarea{font:inherit}
+    .shell{min-height:100vh;display:grid;grid-template-columns:280px 1fr}
+    .side{
+      background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(10,16,30,.98));
+      border-right:1px solid var(--line);padding:22px 18px;display:flex;flex-direction:column;gap:18px
+    }
+    .brand{display:flex;gap:14px;align-items:center;padding:6px 4px 10px}
+    .mark{
+      width:54px;height:54px;border-radius:14px;display:grid;place-items:center;background:#fff;overflow:hidden;box-shadow:var(--shadow)
+    }
+    .mark img{width:100%;height:100%;object-fit:cover}
+    .brand h1{margin:0;font-size:18px}
+    .brand p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .navtitle{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#bfd0ee;margin:8px 0 6px}
+    .nav{display:flex;flex-direction:column;gap:8px}
+    .nav button{
+      border:1px solid transparent;border-radius:14px;padding:12px 14px;text-align:left;background:rgba(255,255,255,.03);
+      color:var(--text);cursor:pointer
+    }
+    .nav button.active{background:linear-gradient(135deg,rgba(59,130,246,.22),rgba(37,99,235,.15));border-color:rgba(59,130,246,.28)}
+    .footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--line)}
+    .pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.14);color:#bfdbfe;font-size:12px;width:fit-content}
+    .small{color:var(--muted);font-size:12px}
+    .main{padding:22px}
+    .top{
+      background:rgba(15,23,42,.84);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+      display:flex;justify-content:space-between;gap:16px;align-items:center;box-shadow:var(--shadow)
+    }
+    .top h2{margin:0;font-size:24px}
+    .top p{margin:6px 0 0;color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:0;border-radius:14px;padding:11px 14px;cursor:pointer;color:#fff;font-weight:700}
+    .pri{background:linear-gradient(135deg,var(--pri),var(--pri2))}
+    .sec{background:rgba(255,255,255,.08)}
+    .danger{background:rgba(239,68,68,.92)}
+    .panel{
+      background:linear-gradient(180deg,rgba(17,28,49,.96),rgba(13,21,38,.96));
+      border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-top:16px
+    }
+    .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .kpi{padding:18px}
+    .klabel{color:var(--muted);font-size:12px;margin-bottom:10px}
+    .kvalue{font-size:28px;font-weight:800;letter-spacing:-.02em}
+    .knote{color:var(--muted);font-size:12px;margin-top:8px}
+    .panel h3{margin:0;font-size:18px}
+    .head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
+    .tag{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.14);color:#bfdbfe;font-size:12px;width:fit-content}
+    label{display:block;font-size:12px;color:#c8d6ea;margin-bottom:6px}
+    input,select,textarea{
+      width:100%;background:#071120;color:var(--text);border:1px solid #23344d;border-radius:12px;padding:11px 12px;outline:none
+    }
+    textarea{min-height:92px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(59,130,246,.72);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+    input[type="date"]::-webkit-calendar-picker-indicator{background:#fff;border-radius:6px;padding:4px;margin-right:6px;cursor:pointer}
+    .span3{grid-column:1/-1}
+    .rowright{display:flex;justify-content:flex-end}
+    .tools{display:flex;gap:10px;flex-wrap:wrap}
+    .search{min-width:220px}
+    .meterblk{margin-top:14px}
+    .meterlab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+    .meter{height:12px;border-radius:999px;overflow:hidden;border:1px solid #22324b;background:#071120}
+    .fill{height:100%;width:0%;border-radius:999px;transition:width .35s ease}
+    .g{background:linear-gradient(90deg,#16a34a,#22c55e)}
+    .b{background:linear-gradient(90deg,#0ea5e9,#38bdf8)}
+    .o{background:linear-gradient(90deg,#d97706,#f59e0b)}
+    .wrap{overflow:auto;border-radius:14px;border:1px solid rgba(255,255,255,.06)}
+    table{width:100%;border-collapse:collapse;min-width:1100px}
+    thead th{position:sticky;top:0;background:#0d1729;color:#d7e2f4;font-size:12px;text-align:left;padding:12px;border-bottom:1px solid #23344d}
+    tbody td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+    tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .edit,.del{border:0;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:12px;color:#fff}
+    .edit{background:#2563eb}
+    .del{background:#dc2626}
+    .report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .metric{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03)}
+    .metric span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+    .metric strong{font-size:15px}
+    .tabs{display:none}
+    .tabs.active{display:block}
+    .template-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .upload{display:inline-block;color:var(--text)}
+    .section-note{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
+    @media (max-width:1200px){
+      .shell{grid-template-columns:1fr}
+      .side{border-right:0;border-bottom:1px solid var(--line)}
+      .nav{flex-direction:row;flex-wrap:wrap}
+      .nav button{flex:1 1 160px}
+      .grid4,.grid2,.form{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:768px){
+      .main{padding:14px}
+      .top{flex-direction:column;align-items:flex-start}
+      .grid4,.grid2,.form,.report-grid{grid-template-columns:1fr}
+      .nav button{flex:1 1 100%}
+      .span3{grid-column:auto}
+    }
+    @media print{
+      body{background:#fff;color:#000}
+      .side,.actions,.nav,.btn,.template-row,.tools,.tag{display:none !important}
+      .shell{display:block}
+      .panel,.top{box-shadow:none;border:1px solid #ddd;background:#fff;color:#000}
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">
+        <div class="mark"><img id="aikuLogoSmall" alt="Aiku Logo" src="" crossorigin="anonymous"></div>
+        <div>
+          <h1>Aiku Finance</h1>
+          <p>Restaurant dashboard</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="navtitle">Modules</div>
+        <div class="nav">
+          <button class="active" data-tab="dashboard">Dashboard</button>
+          <button data-tab="sales">Sales</button>
+          <button data-tab="inventory">Inventory</button>
+          <button data-tab="purchases">Purchases</button>
+          <button data-tab="expenses">Expenses</button>
+          <button data-tab="payments">Payments</button>
+          <button data-tab="reports">Reports</button>
+          <button data-tab="settings">Settings</button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="pill">Single HTML file</div>
+        <div class="small" style="margin-top:8px">Deployed on Netlify — data persists via API</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="top">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img id="aikuLogoHeader" src="" alt="Aiku" style="height:54px;width:54px;border-radius:14px;object-fit:cover;background:#fff" crossorigin="anonymous">
+          <div>
+            <h2 id="pageTitle">Aiku Handroll Bar</h2>
+            <p>Live sales, inventory, supplier, expense, and profitability tracking</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="exportJsonBtn">Export JSON</button>
+          <button class="btn sec" id="exportCsvBtn">Export CSV</button>
+        </div>
+      </header>
+
+      <section id="dashboard" class="tabs active">
+        <div class="grid4">
+          <div class="panel kpi"><div class="klabel">Today Sales</div><div class="kvalue" id="kpiSales">0.00 SAR</div><div class="knote">Net sales total</div></div>
+          <div class="panel kpi"><div class="klabel">Gross Profit</div><div class="kvalue" id="kpiGrossProfit">0.00 SAR</div><div class="knote">Sales minus COGS</div></div>
+          <div class="panel kpi"><div class="klabel">Net Profit</div><div class="kvalue" id="kpiNetProfit">0.00 SAR</div><div class="knote">After expenses</div></div>
+          <div class="panel kpi"><div class="klabel">Cash Variance</div><div class="kvalue" id="kpiCashVariance">0.00 SAR</div><div class="knote">Cash collected vs counted</div></div>
+        </div>
+
+        <div class="grid2">
+          <div class="panel">
+            <div class="head"><h3>Cost Performance</h3><span class="tag">Auto calculated</span></div>
+            <div class="meterblk"><div class="meterlab">Food Cost % <span id="foodCostPctLabel"></span></div><div class="meter"><div id="foodCostBar" class="fill g"></div></div></div>
+            <div class="meterblk"><div class="meterlab">Prime Cost % <span id="primeCostPctLabel"></span></div><div class="meter"><div id="primeCostBar" class="fill b"></div></div></div>
+            <div class="meterblk"><div class="meterlab">Net Margin % <span id="netMarginPctLabel"></span></div><div class="meter"><div id="netMarginBar" class="fill o"></div></div></div>
+          </div>
+
+          <div class="panel">
+            <div class="head"><h3>Performance Summary</h3><span class="tag">Snapshot</span></div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
+              <div class="card"><div class="small">Total Sales</div><div id="dashTotalSales" style="font-weight:800;font-size:18px">0 SAR</div></div>
+              <div class="card"><div class="small">COGS Estimate</div><div id="dashCOGS" style="font-weight:800;font-size:18px">0 SAR</div></div>
+              <div class="card"><div class="small">Gross Profit</div><div id="dashGross" style="font-weight:800;font-size:18px">0 SAR</div></div>
+              <div class="card"><div class="small">Net Profit</div><div id="dashNet" style="font-weight:800;font-size:18px">0 SAR</div></div>
+            </div>
+            <canvas id="dashMiniChart" height="170"></canvas>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="head"><h3>Dashboard Charts</h3><span class="tag">Sales / Profit / Performance</span></div>
+          <div class="grid2">
+            <canvas id="dashBarChart" height="190"></canvas>
+            <canvas id="dashPieChart" height="190"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section id="sales" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Sales Entry</h3><span class="tag">VAT 15% auto-calculated</span></div>
+          <div class="template-row">
+            <button class="btn sec" id="downloadSalesTemplate">Download Template</button>
+            <input id="uploadSalesTemplate" type="file" accept=".csv,.xlsx" class="upload">
+            <button class="btn sec" data-export-section="sales">Export PDF</button>
+          </div>
+          <div class="section-note">Gross sales will automatically calculate VAT at 15% for KSA and net sales will update on save.</div>
+          <form id="salesForm" class="form" style="margin-top:14px">
+            <div><label>Date</label><input id="saleDate" type="date"></div>
+            <div><label>Channel</label><select id="saleChannel"><option>Foodics</option><option>Cash</option><option>Card</option><option>Delivery</option></select></div>
+            <div><label>Outlet</label><input id="saleOutlet" value="Aiku Handroll Bar"></div>
+            <div><label>Gross Sales</label><input id="saleGross" type="number" step="0.01"></div>
+            <div><label>VAT 15%</label><input id="saleVat" type="number" step="0.01" readonly></div>
+            <div><label>Discounts</label><input id="saleDiscounts" type="number" step="0.01" value="0"></div>
+            <div><label>Refunds</label><input id="saleRefunds" type="number" step="0.01" value="0"></div>
+            <div><label>Cash Sales</label><input id="saleCash" type="number" step="0.01" value="0"></div>
+            <div><label>Card Sales</label><input id="saleCard" type="number" step="0.01" value="0"></div>
+            <div class="span3"><label>Notes</label><textarea id="saleNotes"></textarea></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Sales Record</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <h3>Sales Records</h3>
+            <div class="tools">
+              <input id="salesSearch" class="search" placeholder="Search sales...">
+              <select id="salesFilter"><option value="">All channels</option><option>Foodics</option><option>Cash</option><option>Card</option><option>Delivery</option></select>
+            </div>
+          </div>
+          <div id="salesTable"></div>
+        </div>
+      </section>
+
+      <section id="inventory" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Inventory Movement</h3><span class="tag">Opening stock + units</span></div>
+          <div class="template-row">
+            <button class="btn sec" id="downloadInvTemplate">Download Template</button>
+            <input id="uploadInvTemplate" type="file" accept=".csv,.xlsx" class="upload">
+            <button class="btn sec" data-export-section="inventory">Export PDF</button>
+          </div>
+          <div class="section-note">Upload opening inventory first. Units supported: kg, g, l, ml, pcs. Opening stock is stored and shown automatically.</div>
+          <form id="inventoryForm" class="form" style="margin-top:14px">
+            <div><label>Date</label><input id="invDate" type="date"></div>
+            <div><label>Item</label><input id="invItem"></div>
+            <div><label>Unit</label><select id="invUnit"><option>kg</option><option>g</option><option>l</option><option>ml</option><option>pcs</option></select></div>
+            <div><label>Category</label><select id="invCategory"><option>Food</option><option>Beverage</option><option>Packaging</option><option>Cleaning</option></select></div>
+            <div><label>Opening Stock</label><input id="invOpening" type="number" step="0.01" value="0"></div>
+            <div><label>Received</label><input id="invReceived" type="number" step="0.01" value="0"></div>
+            <div><label>Consumed</label><input id="invConsumed" type="number" step="0.01" value="0"></div>
+            <div><label>Waste</label><input id="invWaste" type="number" step="0.01" value="0"></div>
+            <div><label>Closing Count</label><input id="invClosing" type="number" step="0.01" value="0"></div>
+            <div><label>Unit Cost</label><input id="invUnitCost" type="number" step="0.01" value="0"></div>
+            <div class="span3"><label>Variance Reason</label><textarea id="invReason"></textarea></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Inventory Record</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <h3>Inventory Records</h3>
+            <div class="tools">
+              <input id="inventorySearch" class="search" placeholder="Search items...">
+              <select id="inventoryFilter"><option value="">All categories</option><option>Food</option><option>Beverage</option><option>Packaging</option><option>Cleaning</option></select>
+            </div>
+          </div>
+          <div id="inventoryTable"></div>
+        </div>
+      </section>
+
+      <section id="purchases" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Supplier Purchase</h3><span class="tag">Invoices / PO</span></div>
+          <div class="template-row">
+            <button class="btn sec" id="downloadPurchaseTemplate">Download Template</button>
+            <input id="uploadPurchaseTemplate" type="file" accept=".csv,.xlsx" class="upload">
+            <button class="btn sec" data-export-section="purchases">Export PDF</button>
+          </div>
+          <form id="purchaseForm" class="form" style="margin-top:14px">
+            <div><label>Date</label><input id="purDate" type="date"></div>
+            <div><label>Supplier</label><input id="purSupplier"></div>
+            <div><label>Invoice No</label><input id="purInvoice"></div>
+            <div><label>PO No</label><input id="purPO"></div>
+            <div><label>Category</label><select id="purCategory"><option>Food</option><option>Beverage</option><option>Packaging</option><option>Cleaning</option><option>Equipment</option></select></div>
+            <div><label>Total Amount</label><input id="purTotal" type="number" step="0.01"></div>
+            <div><label>Due Date</label><input id="purDue" type="date"></div>
+            <div><label>Approved</label><select id="purApproved"><option>No</option><option>Yes</option></select></div>
+            <div><label>Paid Status</label><select id="purPaid"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
+            <div class="span3"><label>Item Details</label><textarea id="purItems"></textarea></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Purchase</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <h3>Purchases</h3>
+            <div class="tools">
+              <input id="purchaseSearch" class="search" placeholder="Search suppliers...">
+              <select id="purchaseFilter"><option value="">All statuses</option><option>Unpaid</option><option>Partial</option><option>Paid</option></select>
+            </div>
+          </div>
+          <div id="purchaseTable"></div>
+        </div>
+      </section>
+
+      <section id="expenses" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Expense Entry</h3><span class="tag">Maintenance included</span></div>
+          <div class="template-row">
+            <button class="btn sec" id="downloadExpenseTemplate">Download Template</button>
+            <input id="uploadExpenseTemplate" type="file" accept=".csv,.xlsx" class="upload">
+            <button class="btn sec" data-export-section="expenses">Export PDF</button>
+          </div>
+          <div class="section-note">Use Maintenance for equipment servicing and repairs, plus other operating expense categories.</div>
+          <form id="expenseForm" class="form" style="margin-top:14px">
+            <div><label>Date</label><input id="expDate" type="date"></div>
+            <div><label>Category</label><select id="expCategory"><option>Payroll</option><option>Rent</option><option>Utilities</option><option>Maintenance</option><option>Repairs</option><option>Marketing</option><option>Supplies</option><option>Other</option></select></div>
+            <div><label>Vendor</label><input id="expVendor"></div>
+            <div><label>Department</label><select id="expDept"><option>Operations</option><option>Admin</option><option>Kitchen</option><option>Front of House</option></select></div>
+            <div><label>Amount</label><input id="expAmount" type="number" step="0.01"></div>
+            <div><label>Payment Method</label><select id="expPayment"><option>Cash</option><option>Card</option><option>Bank</option></select></div>
+            <div><label>Approved</label><select id="expApproved"><option>No</option><option>Yes</option></select></div>
+            <div class="span3"><label>Notes</label><textarea id="expNotes"></textarea></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Expense</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <h3>Expenses</h3>
+            <div class="tools">
+              <input id="expenseSearch" class="search" placeholder="Search expenses...">
+              <select id="expenseFilter"><option value="">All categories</option><option>Payroll</option><option>Rent</option><option>Utilities</option><option>Maintenance</option><option>Repairs</option><option>Marketing</option><option>Supplies</option><option>Other</option></select>
+            </div>
+          </div>
+          <div id="expenseTable"></div>
+        </div>
+      </section>
+
+      <section id="payments" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Supplier Payment</h3><span class="tag">Cash flow</span></div>
+          <div class="template-row">
+            <button class="btn sec" id="downloadPaymentTemplate">Download Template</button>
+            <input id="uploadPaymentTemplate" type="file" accept=".csv,.xlsx" class="upload">
+            <button class="btn sec" data-export-section="payments">Export PDF</button>
+          </div>
+          <form id="paymentForm" class="form" style="margin-top:14px">
+            <div><label>Date</label><input id="payDate" type="date"></div>
+            <div><label>Supplier</label><input id="paySupplier"></div>
+            <div><label>Invoice No</label><input id="payInvoice"></div>
+            <div><label>Amount Due</label><input id="payDueAmount" type="number" step="0.01"></div>
+            <div><label>Amount Paid</label><input id="payPaidAmount" type="number" step="0.01"></div>
+            <div><label>Method</label><select id="payMethod"><option>Cash</option><option>Bank Transfer</option><option>Card</option></select></div>
+            <div><label>Status</label><select id="payStatus"><option>Pending</option><option>Partial</option><option>Paid</option></select></div>
+            <div><label>Approved By</label><input id="payApprovedBy"></div>
+            <div><label>Balance</label><input id="payBalance" type="number" step="0.01" readonly></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Payment</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <h3>Payments</h3>
+            <div class="tools">
+              <input id="paymentSearch" class="search" placeholder="Search payments...">
+              <select id="paymentFilter"><option value="">All statuses</option><option>Pending</option><option>Partial</option><option>Paid</option></select>
+            </div>
+          </div>
+          <div id="paymentTable"></div>
+        </div>
+      </section>
+
+      <section id="reports" class="tabs">
+        <div class="grid2">
+          <div class="panel">
+            <div class="head"><h3>Report Builder</h3><span class="tag">Easy summary</span></div>
+            <div class="template-row">
+              <button class="btn sec" data-export-section="reports">Export PDF</button>
+            </div>
+            <form id="reportForm" class="form" style="margin-top:14px">
+              <div><label>From</label><input id="reportFrom" type="date"></div>
+              <div><label>To</label><input id="reportTo" type="date"></div>
+              <div><label>Type</label><select id="reportType"><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Yearly</option><option>Feasibility</option></select></div>
+              <div class="span3"><label>Summary Notes</label><textarea id="reportNotes"></textarea></div>
+              <div class="span3 rowright"><button class="btn pri" type="submit">Generate Summary</button></div>
+            </form>
+            <div id="reportOutput" class="list" style="margin-top:14px"></div>
+          </div>
+
+          <div class="panel">
+            <div class="head"><h3>Feasibility vs Actual</h3><span class="tag">Management view</span></div>
+            <div id="feasibilityBox" class="list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="head"><h3>Report Charts</h3><span class="tag">Sales / Expenses / Profit</span></div>
+          <div class="grid2">
+            <canvas id="reportSalesTrend" height="210"></canvas>
+            <canvas id="reportExpensePie" height="210"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="tabs">
+        <div class="panel">
+          <div class="head"><h3>Settings</h3><span class="tag">Cleaner controls</span></div>
+          <form id="settingsForm" class="form">
+            <div><label>Restaurant Name</label><input id="setName" value="Aiku Handroll Bar"></div>
+            <div><label>Base Currency</label><input id="setCurrency" value="SAR"></div>
+            <div><label>Tax Rate %</label><input id="setTax" type="number" step="0.01" value="15"></div>
+            <div><label>Food Cost Target %</label><input id="setFoodTarget" type="number" step="0.01" value="30"></div>
+            <div><label>Net Margin Target %</label><input id="setNetTarget" type="number" step="0.01" value="10"></div>
+            <div><label>Fiscal Start</label><input id="setFiscalStart" type="date"></div>
+            <div><label>Template Format</label><select id="setTemplateFormat"><option>CSV</option><option>XLSX</option></select></div>
+            <div><label>POS Auto Sync</label><select id="setPosSync"><option>Off</option><option>On</option></select></div>
+            <div><label>Upload Brand Logo</label><input id="uploadLogo" type="file" accept="image/*"></div>
+            <div class="span3"><label>Owner Notes</label><textarea id="setNotes"></textarea></div>
+            <div class="span3 rowright"><button class="btn pri" type="submit">Save Settings</button></div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /* ── Persistence: Netlify Blobs via /api/db ── */
+    const API = '/api/db';
+
+    const defaultData=()=>({
+      settings:{
+        name:'Aiku Handroll Bar',
+        currency:'SAR',
+        taxRate:15,
+        foodTarget:30,
+        netTarget:10,
+        fiscalStart:'',
+        templateFormat:'CSV',
+        posSync:'Off',
+        notes:'',
+        logo:''
+      },
+      sales:[],
+      inventory:[],
+      purchases:[],
+      expenses:[],
+      payments:[]
+    });
+
+    let data = defaultData();
+    let AIKU_LOGO_BASE64='';
+    let _saveTimer = null;
+
+    async function loadData(){
+      try{
+        const res = await fetch(API);
+        if(!res.ok) throw new Error('load failed');
+        return await res.json();
+      }catch(e){
+        console.warn('API load failed, using defaults', e);
+        return defaultData();
+      }
+    }
+
+    /* Debounced save – batches rapid saves into one request */
+    function saveData(){
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(async ()=>{
+        try{
+          await fetch(API,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(data)
+          });
+        }catch(e){ console.error('Save failed',e); }
+      }, 400);
+    }
+    function n(v){const x=parseFloat(v);return Number.isFinite(x)?x:0}
+    function money(v){return `${n(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ${data.settings.currency}`}
+    function pct(v){return `${n(v).toFixed(1)}%`}
+    function today(){return new Date().toISOString().slice(0,10)}
+    function uid(prefix){return `${prefix}_${Date.now()}_${Math.floor(Math.random()*1000)}`}
+    function sum(arr,fn){return arr.reduce((a,x)=>a+n(fn?fn(x):x),0)}
+
+    function currentSales(){return sum(data.sales,x=>x.net)}
+    function expensesTotal(){return sum(data.expenses,x=>x.amount)}
+    function payrollTotal(){return sum(data.expenses.filter(x=>x.category==='Payroll'),x=>x.amount)}
+    function purchasesTotal(){return sum(data.purchases,x=>x.total)}
+    function inventoryValue(){return sum(data.inventory,x=>(n(x.closing)||n(x.opening)) * n(x.unitCost))}
+    function cogsEstimate(){return purchasesTotal()*0.55}
+    function cashVariance(){return sum(data.sales,x=>x.cash)-sum(data.sales,x=>x.cashCounted||0)}
+    function grossProfit(){return currentSales()-cogsEstimate()}
+    function netProfit(){return grossProfit()-expensesTotal()}
+    function foodCostPct(){const sales=currentSales();return sales?(cogsEstimate()/sales)*100:0}
+    function primeCostPct(){const sales=currentSales();return sales?((cogsEstimate()+payrollTotal())/sales)*100:0}
+    function netMarginPct(){const sales=currentSales();return sales?(netProfit()/sales)*100:0}
+    function performanceScore(){
+      const fp=Math.max(0,100-foodCostPct());
+      const np=Math.max(0,netMarginPct()*5);
+      return Math.round((fp*0.6)+(np*0.4));
+    }
+
+    function setActiveTab(tabId){
+      document.querySelectorAll('.nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.tab===tabId));
+      document.querySelectorAll('.tabs').forEach(x=>x.classList.toggle('active',x.id===tabId));
+      renderAll();
+    }
+    document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>setActiveTab(btn.dataset.tab)));
+
+    function rowActions(type,id){
+      return `<button class="edit" data-action="edit" data-type="${type}" data-id="${id}">Edit</button> <button class="del" data-action="delete" data-type="${type}" data-id="${id}">Delete</button>`;
+    }
+
+    function tableHTML(rows,cols,type){
+      if(!rows.length)return `<div class="small">No records yet.</div>`;
+      return `<div class="wrap"><table><thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}<th>Actions</th></tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${c.render(r)}</td>`).join('')}<td>${rowActions(type,r.id)}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function filteredRows(list, search, filterKey, filterValue){
+      return list.filter(x=>{
+        const text=Object.values(x).join(' ').toLowerCase();
+        return (!search||text.includes(search.toLowerCase())) && (!filterValue||String(x[filterKey])===filterValue);
+      });
+    }
+
+    let dashMiniChart, dashBarChart, dashPieChart, reportSalesChart, reportExpensePie;
+
+    function drawDashboardMiniChart(labels,salesData,expensesData){
+      const ctx=document.getElementById('dashMiniChart').getContext('2d');
+      if(dashMiniChart) dashMiniChart.destroy();
+      dashMiniChart=new Chart(ctx,{
+        type:'line',
+        data:{labels,datasets:[
+          {label:'Sales',data:salesData,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.10)',fill:true,tension:0.3},
+          {label:'Expenses',data:expensesData,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.08)',fill:true,tension:0.3}
+        ]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:true},y:{display:true}}}
+      });
+    }
+
+    function drawDashboardBars(){
+      const ctx=document.getElementById('dashBarChart').getContext('2d');
+      if(dashBarChart) dashBarChart.destroy();
+      dashBarChart=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:['Sales','COGS','Expenses','Net Profit'],
+          datasets:[{label:'SAR',data:[currentSales(),cogsEstimate(),expensesTotal(),netProfit()],backgroundColor:['#38bdf8','#f59e0b','#ef4444','#22c55e']}]
+        },
+        options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#d7e2f4'}},y:{ticks:{color:'#d7e2f4'}}}}
+      });
+    }
+
+    function drawDashboardPie(){
+      const ctx=document.getElementById('dashPieChart').getContext('2d');
+      if(dashPieChart) dashPieChart.destroy();
+      const sales=currentSales(), exp=expensesTotal(), profit=Math.max(netProfit(),0);
+      dashPieChart=new Chart(ctx,{
+        type:'pie',
+        data:{labels:['Sales','Expenses','Profit'],datasets:[{data:[sales,exp,profit],backgroundColor:['#3b82f6','#ef4444','#22c55e']}]},
+        options:{plugins:{legend:{position:'right'}}}
+      });
+    }
+
+    function buildReportCharts(){
+      const labels=[...data.sales.slice(0,7)].reverse().map(x=>x.date);
+      const salesData=[...data.sales.slice(0,7)].reverse().map(x=>n(x.net));
+      const expData=labels.map(d=>sum(data.expenses.filter(e=>e.date===d),x=>x.amount));
+      const ctx1=document.getElementById('reportSalesTrend').getContext('2d');
+      if(reportSalesChart) reportSalesChart.destroy();
+      reportSalesChart=new Chart(ctx1,{
+        type:'bar',
+        data:{labels,datasets:[{label:'Sales',data:salesData,backgroundColor:'#3b82f6'}]},
+        options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#d7e2f4'}},y:{ticks:{color:'#d7e2f4'}}}}
+      });
+
+      const cats={};
+      data.expenses.forEach(e=>cats[e.category]=(cats[e.category]||0)+n(e.amount));
+      const ctx2=document.getElementById('reportExpensePie').getContext('2d');
+      if(reportExpensePie) reportExpensePie.destroy();
+      reportExpensePie=new Chart(ctx2,{
+        type:'pie',
+        data:{labels:Object.keys(cats),datasets:[{data:Object.values(cats),backgroundColor:['#3b82f6','#22c55e','#f59e0b','#ef4444','#38bdf8','#a855f7','#14b8a6']}]},
+        options:{plugins:{legend:{position:'right'}}}
+      });
+    }
+
+    function renderDashboard(){
+      const sales=currentSales(), gp=grossProfit(), np=netProfit(), fc=foodCostPct(), pc=primeCostPct(), nm=netMarginPct();
+
+      pageTitle.textContent=data.settings.name;
+      kpiSales.textContent=money(sales);
+      kpiGrossProfit.textContent=money(gp);
+      kpiNetProfit.textContent=money(np);
+      kpiCashVariance.textContent=money(cashVariance());
+      foodCostPctLabel.textContent=pct(fc);
+      primeCostPctLabel.textContent=pct(pc);
+      netMarginPctLabel.textContent=pct(nm);
+      foodCostBar.style.width=`${Math.min(fc,100)}%`;
+      primeCostBar.style.width=`${Math.min(pc,100)}%`;
+      netMarginBar.style.width=`${Math.min(Math.max(nm,0),100)}%`;
+
+      document.getElementById('dashTotalSales').textContent=money(sales);
+      document.getElementById('dashCOGS').textContent=money(cogsEstimate());
+      document.getElementById('dashGross').textContent=money(gp);
+      document.getElementById('dashNet').textContent=money(np);
+
+      const labels=[...data.sales.slice(0,7)].reverse().map(x=>x.date);
+      const salesData=[...data.sales.slice(0,7)].reverse().map(x=>n(x.net));
+      const expensesData=labels.map(d=>sum(data.expenses.filter(e=>e.date===d),x=>x.amount));
+      if(labels.length) drawDashboardMiniChart(labels,salesData,expensesData);
+      drawDashboardBars();
+      drawDashboardPie();
+
+      const score=performanceScore();
+      const alertHtml=[];
+      if(fc>data.settings.foodTarget) alertHtml.push(`<div class="item warn">Food cost above target: ${pct(fc)} vs ${data.settings.foodTarget}%</div>`);
+      if(Math.abs(cashVariance())>50) alertHtml.push(`<div class="item bad">Cash variance needs review: ${money(cashVariance())}</div>`);
+      if(np<data.settings.netTarget) alertHtml.push(`<div class="item warn">Net margin below target: ${pct(nm)} vs ${data.settings.netTarget}%</div>`);
+      if(!alertHtml.length) alertHtml.push(`<div class="item good">No urgent alerts. Performance score: ${score}/100</div>`);
+      alertsBox.innerHTML=alertHtml.join('');
+
+      const feas=document.getElementById('feasibilityBox');
+      if(feas){
+        feas.innerHTML=`
+          <div class="card">
+            <h4 style="margin:0 0 10px">Feasibility Snapshot</h4>
+            <div class="report-grid">
+              <div class="metric"><span>Actual Sales</span><strong>${money(sales)}</strong></div>
+              <div class="metric"><span>Gross Profit</span><strong>${money(gp)}</strong></div>
+              <div class="metric"><span>Net Profit</span><strong>${money(np)}</strong></div>
+              <div class="metric"><span>Performance</span><strong>${score}/100</strong></div>
+            </div>
+            <div style="height:12px"></div>
+            <div class="small">Targets: Food ${data.settings.foodTarget}%, Net ${data.settings.netTarget}%</div>
+          </div>`;
+      }
+    }
+
+    function renderSalesTable(){
+      const rows=filteredRows(data.sales,salesSearch.value,'channel',salesFilter.value);
+      salesTable.innerHTML=tableHTML(rows,[
+        {label:'Date',render:r=>r.date},
+        {label:'Channel',render:r=>r.channel},
+        {label:'Outlet',render:r=>r.outlet},
+        {label:'Gross',render:r=>money(r.gross)},
+        {label:'VAT',render:r=>money(r.vat)},
+        {label:'Discounts',render:r=>money(r.discounts)},
+        {label:'Refunds',render:r=>money(r.refunds)},
+        {label:'Net',render:r=>money(r.net)},
+        {label:'Cash',render:r=>money(r.cash)},
+        {label:'Card',render:r=>money(r.card)}
+      ],'sales');
+    }
+
+    function renderInventoryTable(){
+      const rows=filteredRows(data.inventory,inventorySearch.value,'category',inventoryFilter.value);
+      inventoryTable.innerHTML=tableHTML(rows,[
+        {label:'Date',render:r=>r.date},
+        {label:'Item',render:r=>r.item},
+        {label:'Unit',render:r=>r.unit||''},
+        {label:'Category',render:r=>r.category},
+        {label:'Opening',render:r=>r.opening},
+        {label:'Received',render:r=>r.received},
+        {label:'Consumed',render:r=>r.consumed},
+        {label:'Waste',render:r=>r.waste},
+        {label:'Closing',render:r=>r.closing},
+        {label:'Variance',render:r=>r.variance}
+      ],'inventory');
+    }
+
+    function renderPurchaseTable(){
+      const rows=filteredRows(data.purchases,purchaseSearch.value,'paid',purchaseFilter.value);
+      purchaseTable.innerHTML=tableHTML(rows,[
+        {label:'Date',render:r=>r.date},
+        {label:'Supplier',render:r=>r.supplier},
+        {label:'Invoice',render:r=>r.invoice},
+        {label:'PO',render:r=>r.po},
+        {label:'Category',render:r=>r.category},
+        {label:'Total',render:r=>money(r.total)},
+        {label:'Due',render:r=>r.due},
+        {label:'Approved',render:r=>r.approved},
+        {label:'Paid',render:r=>r.paid}
+      ],'purchases');
+    }
+
+    function renderExpenseTable(){
+      const rows=filteredRows(data.expenses,expenseSearch.value,'category',expenseFilter.value);
+      expenseTable.innerHTML=tableHTML(rows,[
+        {label:'Date',render:r=>r.date},
+        {label:'Category',render:r=>r.category},
+        {label:'Vendor',render:r=>r.vendor},
+        {label:'Dept',render:r=>r.dept},
+        {label:'Amount',render:r=>money(r.amount)},
+        {label:'Payment',render:r=>r.payment},
+        {label:'Approved',render:r=>r.approved}
+      ],'expenses');
+    }
+
+    function renderPaymentTable(){
+      const rows=filteredRows(data.payments,paymentSearch.value,'status',paymentFilter.value);
+      paymentTable.innerHTML=tableHTML(rows,[
+        {label:'Date',render:r=>r.date},
+        {label:'Supplier',render:r=>r.supplier},
+        {label:'Invoice',render:r=>r.invoice},
+        {label:'Due',render:r=>money(r.dueAmount)},
+        {label:'Paid',render:r=>money(r.paidAmount)},
+        {label:'Balance',render:r=>money(r.balance)},
+        {label:'Method',render:r=>r.method},
+        {label:'Status',render:r=>r.status},
+        {label:'Approved By',render:r=>r.approvedBy}
+      ],'payments');
+    }
+
+    function renderAll(){
+      renderDashboard();
+      renderSalesTable();
+      renderInventoryTable();
+      renderPurchaseTable();
+      renderExpenseTable();
+      renderPaymentTable();
+
+      setName.value=data.settings.name;
+      setCurrency.value=data.settings.currency;
+      setTax.value=data.settings.taxRate;
+      setFoodTarget.value=data.settings.foodTarget;
+      setNetTarget.value=data.settings.netTarget;
+      setFiscalStart.value=data.settings.fiscalStart||'';
+      setTemplateFormat.value=data.settings.templateFormat||'CSV';
+      setPosSync.value=data.settings.posSync||'Off';
+      setNotes.value=data.settings.notes||'';
+
+      if(data.settings.logo){
+        AIKU_LOGO_BASE64=data.settings.logo;
+        aikuLogoSmall.src=AIKU_LOGO_BASE64;
+        aikuLogoHeader.src=AIKU_LOGO_BASE64;
+      }
+    }
+
+    function saveSale(entry){data.sales.unshift({id:uid('sale'),...entry});saveData();renderAll()}
+    function saveInventory(entry){data.inventory.unshift({id:uid('inv'),...entry});saveData();renderAll()}
+    function savePurchase(entry){data.purchases.unshift({id:uid('pur'),...entry});saveData();renderAll()}
+    function saveExpense(entry){data.expenses.unshift({id:uid('exp'),...entry});saveData();renderAll()}
+    function savePayment(entry){data.payments.unshift({id:uid('pay'),...entry});saveData();renderAll()}
+    function deleteRecord(type,id){data[type]=data[type].filter(x=>x.id!==id);saveData();renderAll()}
+
+    function exportJSON(){
+      const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aiku_finance_data.json';a.click();
+    }
+
+    function exportCSV(){
+      const rows=[['table','date','name','amount','status']];
+      data.sales.forEach(x=>rows.push(['sales',x.date,x.channel,x.net,'']));
+      data.expenses.forEach(x=>rows.push(['expense',x.date,x.vendor,x.amount,x.approved]));
+      data.purchases.forEach(x=>rows.push(['purchase',x.date,x.supplier,x.total,x.paid]));
+      const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob=new Blob([csv],{type:'text/csv'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aiku_finance_export.csv';a.click();
+    }
+
+    function buildPdf(sectionId){
+      const el=document.getElementById(sectionId);
+      const wrapper=document.createElement('div');
+      wrapper.style.padding='16px';
+      wrapper.style.background='#fff';
+      wrapper.style.color='#000';
+
+      const header=document.createElement('div');
+      header.style.display='flex';
+      header.style.alignItems='center';
+      header.style.gap='12px';
+      header.style.marginBottom='14px';
+
+      const img=document.createElement('img');
+      img.src=AIKU_LOGO_BASE64 || data.settings.logo || '';
+      img.style.height='48px';
+      img.style.width='48px';
+      img.style.objectFit='cover';
+      img.style.borderRadius='10px';
+      img.setAttribute('crossorigin','anonymous');
+
+      const text=document.createElement('div');
+      text.innerHTML=`<div style="font-size:20px;font-weight:700">Aiku Handroll Bar</div><div style="font-size:12px;color:#666">Section: ${sectionId} | ${new Date().toLocaleString()}</div>`;
+
+      header.appendChild(img);
+      header.appendChild(text);
+      wrapper.appendChild(header);
+      wrapper.appendChild(el.cloneNode(true));
+
+      html2pdf().set({
+        margin:8,
+        filename:`aiku_${sectionId}_${today()}.pdf`,
+        image:{type:'jpeg',quality:0.98},
+        html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+      }).from(wrapper).save();
+    }
+
+    function downloadCSVTemplate(filename, headers){
+      const csv=headers.join(',')+'\n';
+      const blob=new Blob([csv],{type:'text/csv'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    }
+
+    function parseCSVText(text){
+      const lines=text.trim().split(/\r?\n/).filter(Boolean);
+      const headers=lines.shift().split(',').map(s=>s.trim());
+      return lines.map(line=>{
+        const cols=line.split(',');
+        const obj={};
+        headers.forEach((h,i)=>obj[h]=cols[i]??'');
+        return obj;
+      });
+    }
+
+    function parseSpreadsheetFile(file, onRows){
+      if(file.name.match(/\.(xlsx|xls)$/i) && window.XLSX){
+        const reader=new FileReader();
+        reader.onload=ev=>{
+          const wb=XLSX.read(ev.target.result,{type:'binary'});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          onRows(XLSX.utils.sheet_to_json(ws,{defval:''}));
+        };
+        reader.readAsBinaryString(file);
+      }else{
+        const reader=new FileReader();
+        reader.onload=ev=>onRows(parseCSVText(ev.target.result));
+        reader.readAsText(file);
+      }
+    }
+
+    function importSales(rows){
+      rows.forEach(r=>{
+        const gross=n(r.gross);
+        const vatRate=(n(data.settings.taxRate)||15)/100;
+        const vat=n(r.vat)||+(gross*vatRate).toFixed(2);
+        const discounts=n(r.discounts);
+        const refunds=n(r.refunds);
+        const net=+(gross-vat-discounts-refunds).toFixed(2);
+        saveSale({
+          date:r.date||today(),channel:r.channel||'Foodics',outlet:r.outlet||data.settings.name,
+          gross,vat,discounts,refunds,cash:n(r.cash),card:n(r.card),net,notes:r.notes||''
+        });
+      });
+    }
+
+    function importInventoryOpening(rows){
+      rows.forEach(r=>{
+        const opening=n(r.opening);
+        saveInventory({
+          date:r.date||today(),item:r.item||'',unit:r.unit||'pcs',category:r.category||'Food',
+          opening,received:0,consumed:0,waste:0,closing:opening,unitCost:n(r.unitCost),variance:0,reason:'Opening inventory upload'
+        });
+      });
+    }
+
+    function importPurchases(rows){
+      rows.forEach(r=>savePurchase({
+        date:r.date||today(),supplier:r.supplier||'',invoice:r.invoice||'',po:r.po||'',category:r.category||'Food',
+        total:n(r.total),due:r.due||'',approved:r.approved||'No',paid:r.paid||'Unpaid',items:r.items||''
+      }));
+    }
+
+    function importExpenses(rows){
+      rows.forEach(r=>saveExpense({
+        date:r.date||today(),category:r.category||'Other',vendor:r.vendor||'',dept:r.dept||'Operations',
+        amount:n(r.amount),payment:r.payment||'Bank',approved:r.approved||'No',notes:r.notes||''
+      }));
+    }
+
+    function importPayments(rows){
+      rows.forEach(r=>savePayment({
+        date:r.date||today(),supplier:r.supplier||'',invoice:r.invoice||'',dueAmount:n(r.dueAmount),paidAmount:n(r.paidAmount),
+        balance:n(r.balance)||Math.max(n(r.dueAmount)-n(r.paidAmount),0),method:r.method||'Bank Transfer',
+        status:r.status||'Pending',approvedBy:r.approvedBy||''
+      }));
+    }
+
+    function wireTemplates(){
+      downloadSalesTemplate.onclick=()=>downloadCSVTemplate('sales_template.csv',['date','channel','outlet','gross','vat','discounts','refunds','cash','card','notes']);
+      downloadInvTemplate.onclick=()=>downloadCSVTemplate('inventory_opening_template.csv',['date','item','unit','category','opening','unitCost']);
+      downloadPurchaseTemplate.onclick=()=>downloadCSVTemplate('purchases_template.csv',['date','supplier','invoice','po','category','total','due','approved','paid','items']);
+      downloadExpenseTemplate.onclick=()=>downloadCSVTemplate('expenses_template.csv',['date','category','vendor','dept','amount','payment','approved','notes']);
+      downloadPaymentTemplate.onclick=()=>downloadCSVTemplate('payments_template.csv',['date','supplier','invoice','dueAmount','paidAmount','balance','method','status','approvedBy']);
+
+      uploadSalesTemplate.onchange=e=>{const f=e.target.files[0]; if(f) parseSpreadsheetFile(f,importSales)};
+      uploadInvTemplate.onchange=e=>{const f=e.target.files[0]; if(f) parseSpreadsheetFile(f,importInventoryOpening)};
+      uploadPurchaseTemplate.onchange=e=>{const f=e.target.files[0]; if(f) parseSpreadsheetFile(f,importPurchases)};
+      uploadExpenseTemplate.onchange=e=>{const f=e.target.files[0]; if(f) parseSpreadsheetFile(f,importExpenses)};
+      uploadPaymentTemplate.onchange=e=>{const f=e.target.files[0]; if(f) parseSpreadsheetFile(f,importPayments)};
+    }
+
+    function generateReport(){
+      const total=currentSales(), gp=grossProfit(), np=netProfit(), fc=foodCostPct(), pc=primeCostPct(), nm=netMarginPct(), score=performanceScore();
+      reportOutput.innerHTML=`
+        <div class="card">
+          <h4 style="margin:0 0 10px">${reportType.value} Report</h4>
+          <div class="small">Period: ${reportFrom.value||'Start'} to ${reportTo.value||'Now'}</div>
+          <div style="height:12px"></div>
+          <div class="report-grid">
+            <div class="metric"><span>Sales</span><strong>${money(total)}</strong></div>
+            <div class="metric"><span>COGS</span><strong>${money(cogsEstimate())}</strong></div>
+            <div class="metric"><span>Gross Profit</span><strong>${money(gp)}</strong></div>
+            <div class="metric"><span>Net Profit</span><strong>${money(np)}</strong></div>
+            <div class="metric"><span>Food Cost %</span><strong>${pct(fc)}</strong></div>
+            <div class="metric"><span>Net Margin %</span><strong>${pct(nm)}</strong></div>
+            <div class="metric"><span>Performance</span><strong>${score}/100</strong></div>
+            <div class="metric"><span>Inventory Value</span><strong>${money(inventoryValue())}</strong></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="small">${reportNotes.value||'No notes added.'}</div>
+        </div>`;
+      buildReportCharts();
+    }
+
+    function wire(){
+      salesForm.onsubmit=e=>{
+        e.preventDefault();
+        const gross=n(saleGross.value);
+        const vatRate=(n(data.settings.taxRate)||15)/100;
+        const vat=+(gross*vatRate).toFixed(2);
+        const discounts=n(saleDiscounts.value);
+        const refunds=n(saleRefunds.value);
+        const net=+(gross-vat-discounts-refunds).toFixed(2);
+        saveSale({
+          date:saleDate.value||today(),channel:saleChannel.value,outlet:saleOutlet.value,gross,vat,discounts,refunds,
+          cash:n(saleCash.value),card:n(saleCard.value),net,notes:saleNotes.value
+        });
+        e.target.reset();
+        saleVat.value='';
+      };
+
+      inventoryForm.onsubmit=e=>{
+        e.preventDefault();
+        const opening=n(invOpening.value), received=n(invReceived.value), consumed=n(invConsumed.value), waste=n(invWaste.value), closing=n(invClosing.value);
+        const variance=closing-(opening+received-consumed-waste);
+        saveInventory({
+          date:invDate.value||today(),item:invItem.value,unit:invUnit.value,category:invCategory.value,
+          opening,received,consumed,waste,closing,unitCost:n(invUnitCost.value),variance,reason:invReason.value
+        });
+        e.target.reset();
+      };
+
+      purchaseForm.onsubmit=e=>{
+        e.preventDefault();
+        savePurchase({
+          date:purDate.value||today(),supplier:purSupplier.value,invoice:purInvoice.value,po:purPO.value,
+          category:purCategory.value,total:n(purTotal.value),due:purDue.value,approved:purApproved.value,paid:purPaid.value,items:purItems.value
+        });
+        e.target.reset();
+      };
+
+      expenseForm.onsubmit=e=>{
+        e.preventDefault();
+        saveExpense({
+          date:expDate.value||today(),category:expCategory.value,vendor:expVendor.value,dept:expDept.value,
+          amount:n(expAmount.value),payment:expPayment.value,approved:expApproved.value,notes:expNotes.value
+        });
+        e.target.reset();
+      };
+
+      paymentForm.onsubmit=e=>{
+        e.preventDefault();
+        const due=n(payDueAmount.value), paid=n(payPaidAmount.value);
+        savePayment({
+          date:payDate.value||today(),supplier:paySupplier.value,invoice:payInvoice.value,dueAmount:due,paidAmount:paid,
+          balance:due-paid,method:payMethod.value,status:payStatus.value,approvedBy:payApprovedBy.value
+        });
+        e.target.reset();
+      };
+
+      reportForm.onsubmit=e=>{e.preventDefault();generateReport();};
+
+      settingsForm.onsubmit=e=>{
+        e.preventDefault();
+        data.settings={
+          name:setName.value,
+          currency:setCurrency.value,
+          taxRate:n(setTax.value)||15,
+          foodTarget:n(setFoodTarget.value),
+          netTarget:n(setNetTarget.value),
+          fiscalStart:setFiscalStart.value,
+          templateFormat:setTemplateFormat.value,
+          posSync:setPosSync.value,
+          notes:setNotes.value,
+          logo:data.settings.logo||AIKU_LOGO_BASE64
+        };
+        saveData();
+        renderAll();
+        alert('Settings saved');
+      };
+
+      payDueAmount.oninput=()=>payBalance.value=(n(payDueAmount.value)-n(payPaidAmount.value)).toFixed(2);
+      payPaidAmount.oninput=()=>payBalance.value=(n(payDueAmount.value)-n(payPaidAmount.value)).toFixed(2);
+      saleGross.oninput=()=>{const gross=n(saleGross.value);saleVat.value=(gross*((n(data.settings.taxRate)||15)/100)).toFixed(2);};
+
+      exportJsonBtn.onclick=exportJSON;
+      exportCsvBtn.onclick=exportCSV;
+
+      [salesSearch,salesFilter,inventorySearch,inventoryFilter,purchaseSearch,purchaseFilter,expenseSearch,expenseFilter,paymentSearch,paymentFilter].forEach(el=>{
+        el.oninput=renderAll; el.onchange=renderAll;
+      });
+
+      document.body.onclick=e=>{
+        const btn=e.target.closest('[data-action]');
+        if(btn){
+          const type=btn.dataset.type,id=btn.dataset.id;
+          if(btn.dataset.action==='delete' && confirm('Delete this record?')) deleteRecord(type,id);
+          if(btn.dataset.action==='edit') alert('Edit mode can be added next with inline row editing.');
+        }
+        const pdf=e.target.closest('[data-export-section]');
+        if(pdf) buildPdf(pdf.dataset.exportSection);
+      };
+
+      uploadLogo.onchange=e=>{
+        const f=e.target.files[0];
+        if(!f) return;
+        const r=new FileReader();
+        r.onload=ev=>{
+          AIKU_LOGO_BASE64=ev.target.result;
+          data.settings.logo=AIKU_LOGO_BASE64;
+          aikuLogoSmall.src=AIKU_LOGO_BASE64;
+          aikuLogoHeader.src=AIKU_LOGO_BASE64;
+          saveData();
+        };
+        r.readAsDataURL(f);
+      };
+
+      wireTemplates();
+    }
+
+    function seedDemo(){
+      if(data.sales.length||data.expenses.length||data.purchases.length||data.inventory.length||data.payments.length) return;
+      const t=today();
+      data.sales.push({id:uid('sale'),date:t,channel:'Foodics',outlet:'Aiku Handroll Bar',gross:8500,vat:1109.58,discounts:250,refunds:0,cash:3200,card:5050,net:7140.42,cashCounted:3190,notes:'Demo sales'});
+      data.expenses.push({id:uid('exp'),date:t,category:'Payroll',vendor:'Kitchen Team',dept:'Operations',amount:1800,payment:'Bank',approved:'Yes',notes:'Demo payroll'});
+      data.purchases.push({id:uid('pur'),date:t,supplier:'Central Foods',invoice:'INV-1001',po:'PO-23',category:'Food',total:2400,due:t,approved:'Yes',paid:'Unpaid',items:'Demo inventory purchase'});
+      data.inventory.push({id:uid('inv'),date:t,item:'Salmon',unit:'kg',category:'Food',opening:12,received:8,consumed:15,waste:1,closing:4,unitCost:18,variance:-2,reason:'Demo variance'});
+      data.payments.push({id:uid('pay'),date:t,supplier:'Central Foods',invoice:'INV-1001',dueAmount:2400,paidAmount:0,balance:2400,method:'Bank Transfer',status:'Pending',approvedBy:'Owner'});
+    }
+
+    const pageTitle=document.getElementById('pageTitle');
+    const kpiSales=document.getElementById('kpiSales'),kpiGrossProfit=document.getElementById('kpiGrossProfit'),kpiNetProfit=document.getElementById('kpiNetProfit'),kpiCashVariance=document.getElementById('kpiCashVariance');
+    const foodCostPctLabel=document.getElementById('foodCostPctLabel'),primeCostPctLabel=document.getElementById('primeCostPctLabel'),netMarginPctLabel=document.getElementById('netMarginPctLabel');
+    const foodCostBar=document.getElementById('foodCostBar'),primeCostBar=document.getElementById('primeCostBar'),netMarginBar=document.getElementById('netMarginBar');
+    const alertsBox=document.getElementById('alertsBox');
+    const salesTable=document.getElementById('salesTable'),inventoryTable=document.getElementById('inventoryTable'),purchaseTable=document.getElementById('purchaseTable'),expenseTable=document.getElementById('expenseTable'),paymentTable=document.getElementById('paymentTable');
+    const reportOutput=document.getElementById('reportOutput');
+    const salesForm=document.getElementById('salesForm'),inventoryForm=document.getElementById('inventoryForm'),purchaseForm=document.getElementById('purchaseForm'),expenseForm=document.getElementById('expenseForm'),paymentForm=document.getElementById('paymentForm'),reportForm=document.getElementById('reportForm'),settingsForm=document.getElementById('settingsForm');
+    const saleDate=document.getElementById('saleDate'),saleChannel=document.getElementById('saleChannel'),saleOutlet=document.getElementById('saleOutlet'),saleGross=document.getElementById('saleGross'),saleVat=document.getElementById('saleVat'),saleDiscounts=document.getElementById('saleDiscounts'),saleRefunds=document.getElementById('saleRefunds'),saleCash=document.getElementById('saleCash'),saleCard=document.getElementById('saleCard'),saleNotes=document.getElementById('saleNotes');
+    const invDate=document.getElementById('invDate'),invItem=document.getElementById('invItem'),invUnit=document.getElementById('invUnit'),invCategory=document.getElementById('invCategory'),invOpening=document.getElementById('invOpening'),invReceived=document.getElementById('invReceived'),invConsumed=document.getElementById('invConsumed'),invWaste=document.getElementById('invWaste'),invClosing=document.getElementById('invClosing'),invUnitCost=document.getElementById('invUnitCost'),invReason=document.getElementById('invReason');
+    const purDate=document.getElementById('purDate'),purSupplier=document.getElementById('purSupplier'),purInvoice=document.getElementById('purInvoice'),purPO=document.getElementById('purPO'),purCategory=document.getElementById('purCategory'),purTotal=document.getElementById('purTotal'),purDue=document.getElementById('purDue'),purApproved=document.getElementById('purApproved'),purPaid=document.getElementById('purPaid'),purItems=document.getElementById('purItems');
+    const expDate=document.getElementById('expDate'),expCategory=document.getElementById('expCategory'),expVendor=document.getElementById('expVendor'),expDept=document.getElementById('expDept'),expAmount=document.getElementById('expAmount'),expPayment=document.getElementById('expPayment'),expApproved=document.getElementById('expApproved'),expNotes=document.getElementById('expNotes');
+    const payDate=document.getElementById('payDate'),paySupplier=document.getElementById('paySupplier'),payInvoice=document.getElementById('payInvoice'),payDueAmount=document.getElementById('payDueAmount'),payPaidAmount=document.getElementById('payPaidAmount'),payMethod=document.getElementById('payMethod'),payStatus=document.getElementById('payStatus'),payApprovedBy=document.getElementById('payApprovedBy'),payBalance=document.getElementById('payBalance');
+    const reportFrom=document.getElementById('reportFrom'),reportTo=document.getElementById('reportTo'),reportType=document.getElementById('reportType'),reportNotes=document.getElementById('reportNotes');
+    const setName=document.getElementById('setName'),setCurrency=document.getElementById('setCurrency'),setTax=document.getElementById('setTax'),setFoodTarget=document.getElementById('setFoodTarget'),setNetTarget=document.getElementById('setNetTarget'),setFiscalStart=document.getElementById('setFiscalStart'),setTemplateFormat=document.getElementById('setTemplateFormat'),setPosSync=document.getElementById('setPosSync'),setNotes=document.getElementById('setNotes');
+    const exportJsonBtn=document.getElementById('exportJsonBtn'),exportCsvBtn=document.getElementById('exportCsvBtn');
+    const downloadSalesTemplate=document.getElementById('downloadSalesTemplate'),uploadSalesTemplate=document.getElementById('uploadSalesTemplate');
+    const downloadInvTemplate=document.getElementById('downloadInvTemplate'),uploadInvTemplate=document.getElementById('uploadInvTemplate');
+    const downloadPurchaseTemplate=document.getElementById('downloadPurchaseTemplate'),uploadPurchaseTemplate=document.getElementById('uploadPurchaseTemplate');
+    const downloadExpenseTemplate=document.getElementById('downloadExpenseTemplate'),uploadExpenseTemplate=document.getElementById('uploadExpenseTemplate');
+    const downloadPaymentTemplate=document.getElementById('downloadPaymentTemplate'),uploadPaymentTemplate=document.getElementById('uploadPaymentTemplate');
+    const uploadLogo=document.getElementById('uploadLogo');
+    const aikuLogoSmall=document.getElementById('aikuLogoSmall'),aikuLogoHeader=document.getElementById('aikuLogoHeader');
+
+    function renderAll(){
+      renderDashboard();
+      renderSalesTable();
+      renderInventoryTable();
+      renderPurchaseTable();
+      renderExpenseTable();
+      renderPaymentTable();
+      setName.value=data.settings.name;
+      setCurrency.value=data.settings.currency;
+      setTax.value=data.settings.taxRate;
+      setFoodTarget.value=data.settings.foodTarget;
+      setNetTarget.value=data.settings.netTarget;
+      setFiscalStart.value=data.settings.fiscalStart||'';
+      setTemplateFormat.value=data.settings.templateFormat||'CSV';
+      setPosSync.value=data.settings.posSync||'Off';
+      setNotes.value=data.settings.notes||'';
+      if(data.settings.logo){
+        AIKU_LOGO_BASE64=data.settings.logo;
+        aikuLogoSmall.src=AIKU_LOGO_BASE64;
+        aikuLogoHeader.src=AIKU_LOGO_BASE64;
+      }
+    }
+
+    async function start(){
+      /* Show loading overlay */
+      const overlay = document.createElement('div');
+      overlay.id = 'loadOverlay';
+      overlay.style.cssText='position:fixed;inset:0;background:#07111f;display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#93a7c6';
+      overlay.textContent = 'Loading Aiku Finance…';
+      document.body.appendChild(overlay);
+
+      data = await loadData();
+      seedDemo();
+      saveData();
+      wire();
+      renderAll();
+
+      overlay.remove();
+    }
+
+    start();
+  </script>
+</body>
+</html>
